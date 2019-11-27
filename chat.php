@@ -7,6 +7,7 @@ if (isset($_GET["chat"])){
 		$c = str_replace("hoeveel is ", "", $c);
 		$c = str_replace("bereken het volgende ", "", $c);
 		$c = str_replace("calculate ", "", $c);
+		$c = str_replace("?", "", $c);
 		
 		if (strpos($c, "+") === true){
 			$d = explode("+", $c);
@@ -46,7 +47,12 @@ if (isset($_GET["chat"])){
 			foreach ($d as $value) {
 				$e %= $value;
 			}
+		} else {
+			echo json_encode(array("success"=>false));
+			die();
 		}
+		echo json_encode(array("success"=>true, "a"=>$e, "b"=>$c));
+		die();
 	}
 }
 elseif (isset($_GET["name"])) {
@@ -85,7 +91,10 @@ else {
  		var usr = "<?php echo $_COOKIE["name"]; ?>";
  		document.getElementById("chat").value = chat + "\n" + hours + ":" + min + ":" + sec + " - " + usr + ": " + msg;
  		document.getElementById("msg").value	 = "";
- 		httpGet("chat.php?chat=" + msg);
+ 		var o = JSON.parse(httpGet("chat.php?chat=" + msg));
+		if (o.success) {
+			document.getElementById("chat").value = chat + "\n" + hours + ":" + min + ":" + sec + " - greuBot: " + o.b + " = " + o.a;
+		}
  		var a = document.getElementById("chat");
  		a.scrollTop = a.scrollHeight;
  	}
