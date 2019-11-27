@@ -1,22 +1,23 @@
 <?php
 if (isset($_GET["chat"])){
 		$c = strtolower($_GET["chat"]);
-		if (strpos($c, "bereken voor mij") === true || strpos($c, "wat is") === true || strpos($c, "hoeveel is") === true || strpos($c, "bereken het volgende") === true || strpos($c, "calculate") === true){
+		if (strpos($c, "bereken voor mij") !== false || strpos($c, "wat is") !== false || strpos($c, "hoeveel is") !== false || strpos($c, "bereken het volgende") !== false || strpos($c, "calculate") !== false){
 		$c = str_replace("bereken voor mij ", "", $c);
 		$c = str_replace("wat is ", "", $c);
 		$c = str_replace("hoeveel is ", "", $c);
 		$c = str_replace("bereken het volgende ", "", $c);
 		$c = str_replace("calculate ", "", $c);
 		$c = str_replace("?", "", $c);
+		$c = str_replace(" ", "", $c);
 		
-		if (strpos($c, "+") === true){
+		if (strpos($c, "+") !== false){
 			$d = explode("+", $c);
 			$e = 0;
 			foreach ($d as $value) {
 				$e += $value;
 			}
 		}
-		elseif (strpos($c, "-") === true){
+		elseif (strpos($c, "-") !== false){
 			$d = explode("-", $c);
 			$e = $d[0];
 			array_shift($d);
@@ -24,15 +25,15 @@ if (isset($_GET["chat"])){
 				$e -= $value;
 			}
 		}
-		elseif (strpos($c, "*") === true){
+		elseif (strpos($c, "*") !== false){
 			$d = explode("*", $c);
 			$e = $d[0];
 			array_shift($d);
-			foreach ($c as $value) {
+			foreach ($d as $value) {
 				$e *= $value;
 			}
 		}
-		elseif (strpos($c, "/") === true){
+		elseif (strpos($c, "/") !== false){
 			$d = explode("/", $c);
 			$e = $d[0];
 			array_shift($d);
@@ -40,7 +41,7 @@ if (isset($_GET["chat"])){
 				$e /= $value;
 			}
 		}
-		elseif (strpos($c, "%") === true){
+		elseif (strpos($c, "%") !== false){
 			$d = explode("%", $c);
 			$e = $d[0];
 			array_shift($d);
@@ -48,12 +49,14 @@ if (isset($_GET["chat"])){
 				$e %= $value;
 			}
 		} else {
-			echo json_encode(array("success"=>false));
+			echo json_encode(array("success"=>false, "a"=>$c));
 			die();
 		}
 		echo json_encode(array("success"=>true, "a"=>$e, "b"=>$c));
 		die();
 	}
+	else 
+		echo "10";
 }
 elseif (isset($_GET["name"])) {
 	setcookie("name", $_GET["name"], time() + 3600);
@@ -91,9 +94,9 @@ else {
  		var usr = "<?php echo $_COOKIE["name"]; ?>";
  		document.getElementById("chat").value = chat + "\n" + hours + ":" + min + ":" + sec + " - " + usr + ": " + msg;
  		document.getElementById("msg").value	 = "";
- 		var o = JSON.parse(httpGet("chat.php?chat=" + msg));
+ 		var o = JSON.parse(httpGet("chat.php?chat=" + encodeURIComponent(msg)));
 		if (o.success) {
-			document.getElementById("chat").value = chat + "\n" + hours + ":" + min + ":" + sec + " - greuBot: " + o.b + " = " + o.a;
+			document.getElementById("chat").value = document.getElementById("chat").value + "\n" + hours + ":" + min + ":" + sec + " - greuBot: " + o.b + " = " + o.a;
 		}
  		var a = document.getElementById("chat");
  		a.scrollTop = a.scrollHeight;
